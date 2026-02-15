@@ -122,11 +122,15 @@ async function writeState(state) {
   const state = await readState();
   
   // Send test email
+  const testText = `Test email from GitHub Action.
+  ${STEAM_URL}
+  (inStock=${inStock}, hash=${hash})`;
+
+  console.log("DEBUG testText:", JSON.stringify(testText));
+
   await sendEmail({
     subject: "TEST: Steam Deck watcher",
-    text: `Test email from GitHub Action.
-  ${STEAM_URL}
-  (inStock=${inStock}, hash=${hash})`,
+    text: testText,
     toEmails: [process.env.TO_EMAIL],
   });
   console.log("Test email sent (email only).");
