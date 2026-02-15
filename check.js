@@ -120,6 +120,12 @@ async function writeState(state) {
   const hash = crypto.createHash("sha256").update(body).digest("hex").slice(0, 16);
 
   const state = await readState();
+  await sendEmail({
+    subject: "TEST: Steam Deck watcher",
+    text: 'Test email from GitHub Action.\n${STEAM_URL}\n(inStock={inStock}, hash=${hash})',
+    toEmails: [process.env.TO_EMAIL, process.env.TO_SMS],
+  });
+  console.log("Test email sent.");
   const flippedToInStock = inStock && !state.lastInStock;
 
   console.log(`inStock=${inStock} prev=${state.lastInStock} hash=${hash}`);
