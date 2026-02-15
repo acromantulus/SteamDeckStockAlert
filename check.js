@@ -120,12 +120,18 @@ async function writeState(state) {
   const hash = crypto.createHash("sha256").update(body).digest("hex").slice(0, 16);
 
   const state = await readState();
+  
+  // Send test email
   await sendEmail({
     subject: "TEST: Steam Deck watcher",
-    text: 'Test email from GitHub Action.\n${STEAM_URL}\n(inStock={inStock}, hash=${hash})',
-    toEmails: [process.env.TO_EMAIL, process.env.TO_SMS],
+    text: `Test email from GitHub Action.
+  ${STEAM_URL}
+  (inStock=${inStock}, hash=${hash})`,
+    toEmails: [process.env.TO_EMAIL],
   });
-  console.log("Test email sent.");
+  console.log("Test email sent (email only).");
+
+
   const flippedToInStock = inStock && !state.lastInStock;
 
   console.log(`inStock=${inStock} prev=${state.lastInStock} hash=${hash}`);
@@ -136,7 +142,7 @@ async function writeState(state) {
     await sendEmail({
       subject,
       text,
-      toEmails: [process.env.TO_EMAIL, process.env.TO_SMS],
+      toEmails: [process.env.TO_EMAIL],
     });
     console.log("Stock alert sent.");
   }
