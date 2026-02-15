@@ -1,0 +1,46 @@
+name: Steam Deck Stock Watcher
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"  # every 10 minutes
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # Restore last state between runs
+      - name: Restore state cache
+        uses: actions/cache@v4
+        with:
+          path: last_state.json
+          key: steamdeck-state-${{ github.ref_name }}
+          restore-keys: |
+            steamdeck-state-
+
+      - name: Install (none needed)
+        run: echo "No deps"
+
+      - name: Run checker
+        env:
+          STEAM_URL: ${{ secrets.STEAM_URL }}
+          SENDGRID_KEY: ${{ secrets.SENDGRID_KEY }}
+          TO_EMAIL: ${{ secrets.TO_EMAIL }}
+          TO_SMS: ${{ secrets.TO_SMS }}
+          FROM_EMAIL: ${{ secrets.FROM_EMAIL }}
+        run: node check.js
+
+      # Save updated state
+      - name: Save state cache
+        uses: actions/cache@v4
+        with:
+          path: last_state.json
+          key: steamdeck-state-${{ github.ref_name }}-${{ github.run_id }}
+          restore-keys: |
+            steamdeck-state-${{ github.ref_name }}-
